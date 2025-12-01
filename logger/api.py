@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+from .db import save_log
 
 
 class MyHttpRequestHandler(BaseHTTPRequestHandler):
@@ -10,7 +11,8 @@ class MyHttpRequestHandler(BaseHTTPRequestHandler):
             post_data_bytes = self.rfile.read(content_length)
             post_data_str = post_data_bytes.decode("utf-8")
             json_log = json.loads(post_data_str)
-            print(json_log)
+            json_log["ip"] = self.client_address[0]  # IP-Adresse des Clients
+            save_log(json_log)
             self.send_response(200)
             self.end_headers()
 

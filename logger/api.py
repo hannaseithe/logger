@@ -12,8 +12,8 @@ class MyHttpRequestHandler(BaseHTTPRequestHandler):
             post_data_str = post_data_bytes.decode("utf-8")
             json_log = json.loads(post_data_str)
             json_log["ip"] = self.client_address[0]  # IP-Adresse des Clients
-            save_log(json_log)
-            self.send_response(200)
+            status_code = save_log(json_log)
+            self.send_response(status_code)
             self.end_headers()
 
 def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):

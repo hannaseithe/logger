@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from .db import save_log
+from .db import save_log, get_logs
 
 
 class MyHttpRequestHandler(BaseHTTPRequestHandler):
@@ -15,6 +15,19 @@ class MyHttpRequestHandler(BaseHTTPRequestHandler):
             status_code = save_log(json_log)
             self.send_response(status_code)
             self.end_headers()
+
+    def do_GET(self):
+        if self.path =="/logs":
+            try:
+                logs = get_logs()
+            except:
+                self.send_response(500)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(logs).encode("utf-8"))
+
 
 def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
     server_address = ('', 8000)

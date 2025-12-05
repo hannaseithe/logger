@@ -17,22 +17,29 @@ def valid_log(log):
         return False
     return True
 
+def get_cursor(connection):
+    cursor = connection.cursor()
+
+    return cursor
+
+def create_logs_if_not_exists(cursor):
+    sql_create_command = """
+    CREATE TABLE IF NOT EXISTS logs (
+    id INTEGER PRIMARY KEY,
+    message VARCHAR(500), 
+    level VARCHAR(30), 
+    ip VARCHAR(100),
+    logged_at DATETIME NOT NULL
+    );"""
+
+    cursor.execute(sql_create_command)
+
 def save_log(log):
     if valid_log(log): 
         connection = sqlite3.connect("logger.db")
-        cursor = connection.cursor()
-
-        sql_create_command = """
-        CREATE TABLE IF NOT EXISTS logs (
-        id INTEGER PRIMARY KEY,
-        message VARCHAR(500), 
-        level VARCHAR(30), 
-        ip VARCHAR(100),
-        logged_at DATETIME NOT NULL
-        );"""
-
-        cursor.execute(sql_create_command)
-
+        cursor = get_cursor(connection)
+        create_logs_if_not_exists(cursor)
+        
         now = datetime.datetime.now()
 
         cursor.execute("""
@@ -46,3 +53,21 @@ def save_log(log):
         return 200
     else:
         return 400
+    
+def get_logs():
+    connection = sqlite3.connect("logger.db")
+    cursor = get_cursor(connection)
+    create_logs_if_not_exists(cursor)
+    cursor.execute('select * from logs')
+    rows = cursor.fetchall()
+    connection.close()
+    logs = []
+    for row in rows:
+        log = {}
+        log["id"] = row[0]
+        log["message"] = row[1]
+        log["level"] = row[2]
+        log["ip"] = row[3]
+        log["logged_at"] = row[4]
+        logs.append(log)
+    return logs

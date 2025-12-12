@@ -1,5 +1,8 @@
+import os
 import sqlite3
 import datetime
+
+from logger.migrate import do_migrations
 
 LEVELS = ["info", "error", "debug", "warning"]
 
@@ -71,3 +74,7 @@ def get_logs():
         log["logged_at"] = row[4]
         logs.append(log)
     return logs
+
+
+def init_db():
+    do_migrations()

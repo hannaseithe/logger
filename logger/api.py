@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from .db import save_log, get_logs
+from .db import init_db, save_log, get_logs
 
 
 class MyHttpRequestHandler(BaseHTTPRequestHandler):
@@ -32,4 +32,6 @@ class MyHttpRequestHandler(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
     server_address = ('', 8000)
     httpd = server_class(server_address, handler_class)
+    init_db()
     httpd.serve_forever()
+
